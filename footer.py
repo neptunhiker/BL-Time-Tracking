@@ -25,7 +25,7 @@ def gen_footer_table(width, height):
     res.setStyle([
         # ("GRID", (0, 0), (-1, -1), 1, "red"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("BACKGROUND", (0, 0), (-1, -1), color),
+        # ("BACKGROUND", (0, 0), (-1, -1), color),
         ("TEXTCOLOR", (0, 0), (-1, -1), "black"),
         ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # horizontal
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),

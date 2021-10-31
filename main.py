@@ -86,6 +86,7 @@ main_table.setStyle([
     ("LEFTPADDING", (0, 0), (0, -1), 0),
     ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ("BOTTOMPADDING", (0, -2), (-1, -2), 20),
+    ("LINEBELOW", (0,1), (-1,1), 1, "grey"),
 ])
 main_table.wrapOn(pdf, 0, 0)
 main_table.drawOn(pdf, 0, 0)
