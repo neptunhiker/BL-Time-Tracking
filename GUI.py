@@ -41,7 +41,9 @@ class BeginnerLuftGUI(tk.Tk):
         self.style.configure("OverviewRight.TLabel", background="yellow", foreground="black", justify="left",
                              font=("Times New Roman", 10), wraplength=300)
         self.style.configure("Data.TEntry", width=60)
-        self.geometry("600x400")
+        self.geometry("800x400")
+
+        self.report = None
 
         self.participant_name = ""
         self.training_name = "Individuelles Berufscoaching"
@@ -291,37 +293,46 @@ class BeginnerLuftGUI(tk.Tk):
 
         self.active_frame = ttk.Frame(self, style="Intro.TFrame")
         self.active_frame.grid(row=1, column=0, sticky="nsew")
-        self.active_frame.grid_columnconfigure(0, weight=1)
-        self.active_frame.grid_columnconfigure(1, weight=1)
-        for i in range(8):
+        self.active_frame.grid_columnconfigure(0, weight=10)
+        self.active_frame.grid_columnconfigure(1, weight=10)
+        self.active_frame.grid_columnconfigure(2, weight=1)
+        for i in range(5):
             self.active_frame.grid_rowconfigure(i, weight=1)
 
-        lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
-        lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
-        txt = tk.Text(self.active_frame, width=30, height=10)
-        txt.grid(row=1, column=1, sticky="news")
-        txt.insert("1.0", "#" * 4060)
+        # prepare the report
+        self.report = TimeReport(gui=self)
 
         lbl_time_period = ttk.Label(self.active_frame, text="Wähle Zeitraum", style="OverviewHeader.TLabel", anchor=tk.CENTER)
         lbl_time_period.grid(row=0, column=0, sticky="nwe", pady=(20,0))
 
+        lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
+        lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
+        txt = tk.Text(self.active_frame, width=30, height=10)
+        txt.grid(row=1, column=1, sticky="news", padx=(10,10))
+
+        # insert dataframe content as a preview to user into text field
+        txt.delete("1.0", tk.END)
+        df = self.report.df
+        df.set_index("Datum", inplace=True)
+        txt.insert(tk.END, df)
+
         scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=txt.yview)
-        scrollbar.grid(row=1, column=2, sticky="ns")
+        scrollbar.grid(row=1, column=2, sticky="ns", padx=(0,10))
         #  communicate back to the scrollbar
         txt['yscrollcommand'] = scrollbar.set
 
-        lbl_create_report = ttk.Label(self.active_frame, text="Erstelle Report", style="OverviewHeader.TLabel")
-        lbl_create_report.grid(row=7, column=1, sticky="nw", padx=(10, 0))
+        lbl_create_report = ttk.Label(self.active_frame, text="Erstelle Report", style="OverviewHeader.TLabel",
+                                      anchor=tk.CENTER)
+        lbl_create_report.grid(row=3, column=1, sticky="new", padx=(10, 0))
         lbl_create_report.bind("<Enter>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_enter(event, label_widget))
         lbl_create_report.bind("<Leave>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_leave(event, label_widget))
         lbl_create_report.bind("<Button-1>", self.create_report)
-        self.create_button_back(row=8, collection_function=self.collection_placeholder,
+        self.create_button_back(row=4, collection_function=self.collection_placeholder,
                                 nav_function=self.create_menu_data_overview)
 
     def create_report(self, event):
         directory = askdirectory()
-        report = TimeReport(gui=self)
-        success = report.create_report(output_directory=directory)
+        success = self.report.create_report(output_directory=directory)
         if success:
             messagebox.showinfo(title="BeginnerLuft Zeiterfassung",
                                 message=f"Zeiterfassungsreport für {self.participant_name} erstellt.")
