@@ -2,8 +2,11 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askdirectory
+from tkinter import messagebox
 
 from main_menu import MainMenu
+from main import TimeReport
 
 
 class BeginnerLuftGUI(tk.Tk):
@@ -228,9 +231,9 @@ class BeginnerLuftGUI(tk.Tk):
         self.create_button_back(row=3, collection_function=self.collection_placeholder,
                                 nav_function=self.create_menu_ze_coach)
         self.create_button_forward(row=3, column=1, collection_function=self.collection_placeholder,
-                                   nav_function=self.create_menu_timeperiod)
+                                   nav_function=self.create_menu_data_overview)
 
-    def create_menu_timeperiod(self, event):
+    def create_menu_data_overview(self, event):
 
         self.nav_frame.destroy()
         self.active_frame.destroy()
@@ -242,12 +245,40 @@ class BeginnerLuftGUI(tk.Tk):
         self.active_frame.grid(row=1, column=0, sticky="nsew")
         self.active_frame.grid_columnconfigure(0, weight=1)
         self.active_frame.grid_columnconfigure(1, weight=1)
-        for i in range(3):
+        for i in range(8):
             self.active_frame.grid_rowconfigure(i, weight=1)
 
-        self.create_button_back(row=3, collection_function=self.collection_placeholder,
+        lbl_overview = ttk.Label(self.active_frame, text="Datenübersicht", style="OverviewHeader.TLabel")
+
+        lbl_name = ttk.Label(self.active_frame, text="Teilnehmer:in", style="OverviewLeft.TLabel")
+        lbl_training_name = ttk.Label(self.active_frame, text="Maßnahmenbezeichnung", style="OverviewLeft.TLabel")
+        lbl_training_nr = ttk.Label(self.active_frame, text="Maßnahmennummer", style="OverviewLeft.TLabel")
+        lbl_file_ze_coach = ttk.Label(self.active_frame, text="Datei ZE Coach", style="OverviewLeft.TLabel")
+        lbl_file_ze_bl = ttk.Label(self.active_frame, text="Datei ZE BeginnerLuft", style="OverviewLeft.TLabel")
+
+        left_hand_labels = [lbl_name, lbl_training_name, lbl_training_nr, lbl_file_ze_coach, lbl_file_ze_bl]
+
+        lbl_real_name = ttk.Label(self.active_frame, text=self.participant_name, style="OverviewRight.TLabel")
+        lbl_real_training_name = ttk.Label(self.active_frame, text=self.training_name, style="OverviewRight.TLabel")
+        lbl_real_training_nr = ttk.Label(self.active_frame, text=self.training_nr, style="OverviewRight.TLabel")
+        lbl_real_file_ze_coach = ttk.Label(self.active_frame, text=self.file_ze_coach, style="OverviewRight.TLabel")
+        lbl_real_file_ze_bl = ttk.Label(self.active_frame, text=self.file_ze_beginnerluft, style="OverviewRight.TLabel")
+
+        right_hand_labels = [lbl_real_name, lbl_real_training_name, lbl_real_training_nr, lbl_real_file_ze_coach,
+                             lbl_real_file_ze_bl]
+
+        lbl_overview.grid(row=0, column=1, sticky="w", pady=(10, 10), padx=(10, 0))
+
+        for i, label in enumerate(left_hand_labels):
+            label.grid(row=i + 1, column=0, sticky="ne", padx=(0, 10))
+
+        for i, label in enumerate(right_hand_labels):
+            label.grid(row=i + 1, column=1, sticky="nw", padx=(10, 0))
+
+
+        self.create_button_back(row=8, collection_function=self.collection_placeholder,
                                 nav_function=self.create_menu_ze_beginnerluft)
-        self.create_button_forward(row=3, column=1, collection_function=self.collection_placeholder,
+        self.create_button_forward(row=8, column=1, collection_function=self.collection_placeholder,
                                    nav_function=self.create_menu_report)
 
     def create_menu_report(self, event):
@@ -265,44 +296,38 @@ class BeginnerLuftGUI(tk.Tk):
         for i in range(8):
             self.active_frame.grid_rowconfigure(i, weight=1)
 
-        lbl_overview = ttk.Label(self.active_frame, text="Datenübersicht", style="OverviewHeader.TLabel")
+        lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
+        lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
+        txt = tk.Text(self.active_frame, width=30, height=10)
+        txt.grid(row=1, column=1, sticky="news")
+        txt.insert("1.0", "#" * 4060)
 
-        lbl_name = ttk.Label(self.active_frame, text="Teilnehmer:in", style="OverviewLeft.TLabel")
-        lbl_training_name = ttk.Label(self.active_frame, text="Maßnahmenbezeichnung", style="OverviewLeft.TLabel")
-        lbl_training_nr = ttk.Label(self.active_frame, text="Maßnahmennummer", style="OverviewLeft.TLabel")
-        lbl_file_ze_coach = ttk.Label(self.active_frame, text="Datei ZE Coach", style="OverviewLeft.TLabel")
-        lbl_file_ze_bl = ttk.Label(self.active_frame, text="Datei ZE BeginnerLuft", style="OverviewLeft.TLabel")
-        lbl_time_period = ttk.Label(self.active_frame, text="Zeitraum", style="OverviewLeft.TLabel")
+        lbl_time_period = ttk.Label(self.active_frame, text="Wähle Zeitraum", style="OverviewHeader.TLabel", anchor=tk.CENTER)
+        lbl_time_period.grid(row=0, column=0, sticky="nwe", pady=(20,0))
 
-        left_hand_labels = [lbl_name, lbl_training_name, lbl_training_nr, lbl_file_ze_coach, lbl_file_ze_bl,
-                            lbl_time_period]
-
-        lbl_real_name = ttk.Label(self.active_frame, text=self.participant_name, style="OverviewRight.TLabel")
-        lbl_real_training_name = ttk.Label(self.active_frame, text=self.training_name, style="OverviewRight.TLabel")
-        lbl_real_training_nr = ttk.Label(self.active_frame, text=self.training_nr, style="OverviewRight.TLabel")
-        lbl_real_file_ze_coach = ttk.Label(self.active_frame, text=self.file_ze_coach, style="OverviewRight.TLabel")
-        lbl_real_file_ze_bl = ttk.Label(self.active_frame, text=self.file_ze_beginnerluft, style="OverviewRight.TLabel")
-        lbl_real_time_period = ttk.Label(self.active_frame, text="PLACEHOLDER", style="OverviewRight.TLabel")
-
-        right_hand_labels = [lbl_real_name, lbl_real_training_name, lbl_real_training_nr, lbl_real_file_ze_coach,
-                             lbl_real_file_ze_bl, lbl_real_time_period]
-
-        lbl_overview.grid(row=0, column=1, sticky="w", pady=(10, 10), padx=(10, 0))
-
-        for i, label in enumerate(left_hand_labels):
-            label.grid(row=i + 1, column=0, sticky="ne", padx=(0, 10))
-
-        for i, label in enumerate(right_hand_labels):
-            label.grid(row=i + 1, column=1, sticky="nw", padx=(10, 0))
-
+        scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=txt.yview)
+        scrollbar.grid(row=1, column=2, sticky="ns")
+        #  communicate back to the scrollbar
+        txt['yscrollcommand'] = scrollbar.set
 
         lbl_create_report = ttk.Label(self.active_frame, text="Erstelle Report", style="OverviewHeader.TLabel")
         lbl_create_report.grid(row=7, column=1, sticky="nw", padx=(10, 0))
         lbl_create_report.bind("<Enter>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_enter(event, label_widget))
         lbl_create_report.bind("<Leave>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_leave(event, label_widget))
-
+        lbl_create_report.bind("<Button-1>", self.create_report)
         self.create_button_back(row=8, collection_function=self.collection_placeholder,
-                                nav_function=self.create_menu_timeperiod)
+                                nav_function=self.create_menu_data_overview)
+
+    def create_report(self, event):
+        directory = askdirectory()
+        report = TimeReport(gui=self)
+        success = report.create_report(output_directory=directory)
+        if success:
+            messagebox.showinfo(title="BeginnerLuft Zeiterfassung",
+                                message=f"Zeiterfassungsreport für {self.participant_name} erstellt.")
+        else:
+            messagebox.showerror(title="BeginnerLuft Zeiterfassung",
+                                 message=f"Zeiterfassungsreport für {self.participant_name} konnte nicht erstellt werden.")
 
     def lbl_on_enter(self, event, label_widget, color_change=True):
         if color_change:
@@ -344,8 +369,8 @@ class BeginnerLuftGUI(tk.Tk):
         lbl_tt_bl = ttk.Label(self.nav_frame, text="ZE BeginnerLuft", style=styles[format_choice[2]])
         lbl_tt_bl.grid(row=0, column=2, sticky="n", padx=10, pady=5)
 
-        lbl_timeperiod = ttk.Label(self.nav_frame, text="Zeitraum", style=styles[format_choice[3]])
-        lbl_timeperiod.grid(row=0, column=3, sticky="n", padx=10, pady=5)
+        lbl_data_overview = ttk.Label(self.nav_frame, text="Datenübersicht", style=styles[format_choice[3]])
+        lbl_data_overview.grid(row=0, column=3, sticky="n", padx=10, pady=5)
 
         lbl_output = ttk.Label(self.nav_frame, text="Report Erstellung", style=styles[format_choice[4]])
         lbl_output.grid(row=0, column=4, sticky="n", padx=10, pady=5)
