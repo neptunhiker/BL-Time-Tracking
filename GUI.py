@@ -1,3 +1,4 @@
+import datetime
 import os
 import tkinter as tk
 from tkinter import ttk
@@ -41,6 +42,8 @@ class BeginnerLuftGUI(tk.Tk):
         self.style.configure("OverviewRight.TLabel", background="yellow", foreground="black", justify="left",
                              font=("Times New Roman", 10), wraplength=300)
         self.style.configure("Data.TEntry", width=60)
+        self.style.configure("TCheckbutton", background="yellow", foreground="black", font=("Times New Roman", 10))
+
         self.geometry("800x400")
 
         self.report = None
@@ -302,8 +305,19 @@ class BeginnerLuftGUI(tk.Tk):
         # prepare the report
         self.report = TimeReport(gui=self)
 
-        lbl_time_period = ttk.Label(self.active_frame, text="Wähle Zeitraum", style="OverviewHeader.TLabel", anchor=tk.CENTER)
-        lbl_time_period.grid(row=0, column=0, sticky="nwe", pady=(20,0))
+        lbl_time_period = ttk.Label(self.active_frame, text="Wähle Zeitraum", style="OverviewHeader.TLabel")
+        lbl_time_period.grid(row=0, column=0, sticky="nwe", pady=(20,0), padx=(60,0))
+
+        # create a place checkbuttons
+        frame_time_period = ttk.Frame(self.active_frame, style="Intro.TFrame")
+        frame_time_period.grid(row=1, column=0, sticky = "nsew")
+        checkbutton_list = self.create_checkbuttons(frame=frame_time_period)
+        frame_time_period.grid_columnconfigure(0, weight=1)
+        for i, checkbutton in enumerate(checkbutton_list):
+            frame_time_period.grid_rowconfigure(i, weight=1)
+            checkbutton.grid(row=1 + i, column=0, sticky="w", padx=(60,0))
+
+        checkbutton_list[-2].var.set(1)  # turns on the latest available month
 
         lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
         lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
@@ -318,8 +332,7 @@ class BeginnerLuftGUI(tk.Tk):
 
         scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=txt.yview)
         scrollbar.grid(row=1, column=2, sticky="ns", padx=(0,10))
-        #  communicate back to the scrollbar
-        txt['yscrollcommand'] = scrollbar.set
+        txt['yscrollcommand'] = scrollbar.set  #  communicate back to the scrollbar
 
         lbl_create_report = ttk.Label(self.active_frame, text="Erstelle Report", style="OverviewHeader.TLabel",
                                       anchor=tk.CENTER)
@@ -339,6 +352,43 @@ class BeginnerLuftGUI(tk.Tk):
         else:
             messagebox.showerror(title="BeginnerLuft Zeiterfassung",
                                  message=f"Zeiterfassungsreport für {self.participant_name} konnte nicht erstellt werden.")
+
+    def create_checkbuttons(self, frame):
+
+        # output / return value
+        checkbutton_list = []
+
+        # get unique dates
+        dates = self.report.df["Datum"].unique()
+
+        # parse them to datetime and then format them
+        parsed_dates = [datetime.datetime.strptime(date, "%d.%m.%y") for date in dates]
+        parsed_dates.sort()
+        formatted_dates = [date.strftime("%m/%Y") for date in parsed_dates]
+
+        # keep only unique month/year combinations
+        final_dates = set(formatted_dates)
+
+        # sort those combinations
+        final_parsed_dates = [datetime.datetime.strptime(date, "%m/%Y") for date in final_dates]
+        final_parsed_dates.sort()
+        final_formatted_dates = [date.strftime("%m/%Y") for date in final_parsed_dates]
+
+        # create checkbuttons
+        for i, date in enumerate(final_formatted_dates):
+            var = tk.IntVar()
+            cbtn = ttk.Checkbutton(frame, text=date, variable=var, style="TCheckbutton")
+            cbtn.state(['!alternate'])  # remove alternate selected state
+            cbtn.var = var  # attach variable to checkbutton
+            checkbutton_list.append(cbtn)
+
+        var = tk.IntVar()
+        cbtn = ttk.Checkbutton(frame, text="Gesamter Zeitraum", variable=var, style="TCheckbutton")
+        cbtn.state(['!alternate'])  # remove alternate selected state
+        cbtn.var = var  # attach variable to checkbutton
+        checkbutton_list.append(cbtn)
+
+        return checkbutton_list
 
     def lbl_on_enter(self, event, label_widget, color_change=True):
         if color_change:
