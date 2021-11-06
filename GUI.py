@@ -58,8 +58,8 @@ class BeginnerLuftGUI(tk.Tk):
         self.ent_t_name = None
         self.ent_t_nr = None
 
-        self.file_ze_coach = "- noch keine Datei ausgewählt -"
-        self.file_ze_beginnerluft = "- noch keine Datei ausgewählt -"
+        self.file_ze_coach = "keine Datei ausgewählt"
+        self.file_ze_beginnerluft = "keine Datei ausgewählt"
 
         self.txt_preview = None
         self.checkbutton_list = []
@@ -359,17 +359,25 @@ class BeginnerLuftGUI(tk.Tk):
         path = asksaveasfilename(title="BeginnerLuft Zeiterfassung", initialdir=os.path.join(os.getcwd(), "reports"),
                                  initialfile=filename, filetypes=(("pdf", "*.pdf"), ))
 
-        if not self.report.error:
-            success = self.report.create_report(path)
-        else:
-            success = False
+        print(path)
 
-        if success:
-            messagebox.showinfo(title="BeginnerLuft Zeiterfassung",
-                                message=f"Zeiterfassungsreport für {self.participant_name} erstellt.")
-        else:
-            messagebox.showerror(title="BeginnerLuft Zeiterfassung",
-                                 message=f"Zeiterfassungsreport für {self.participant_name} konnte nicht erstellt werden.")
+        # create pdf report
+        if not path == "":
+            if not self.report.error:
+                success = self.report.create_report(path)
+            else:
+                success = False
+
+            # Success or failure messages of report creation
+            if success:
+                messagebox.showinfo(title="BeginnerLuft Zeiterfassung",
+                                    message=f"Zeiterfassungsreport für {self.participant_name} erstellt. Speicherort:\n\n"
+                                            f"{path}")
+            else:
+                messagebox.showerror(title="BeginnerLuft Zeiterfassung",
+                                     message=f"Zeiterfassungsreport für {self.participant_name} konnte nicht erstellt"
+                                             f" werden. Bitte kontrollen, ob Zeiterfassungsdateien im richtigen Format "
+                                             f"vorliegen. Anschließend die Reporterstellung nochmals starten.")
 
     def change_preview(self, event, btn):
         # determine selected months
