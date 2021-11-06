@@ -6,7 +6,7 @@ from reportlab.lib import colors
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 
-def gen_body_table(width, height, data, training_name, training_nr, participant_name, month, date_ranges):
+def gen_body_table(width, height, data, training_name, training_nr, participant_name, date_ranges):
 
     participant_name = participant_name
     width_list = [
@@ -23,7 +23,7 @@ def gen_body_table(width, height, data, training_name, training_nr, participant_
         ]
     res = Table([
         ["", _gen_meta_data(participant_name=participant_name, training_name=training_name, training_nr=training_nr,
-                            month=month, data=data, date_ranges=date_ranges), ""],
+                            data=data, date_ranges=date_ranges), ""],
         ["", _gen_times_table(width=width_list[1], height=height_list[1], data=data), ""],
         ["", _gen_confirmation_text(training_name=training_name, participant_name=participant_name,
                                     date_ranges=date_ranges), ""],
@@ -52,11 +52,10 @@ def gen_body_table(width, height, data, training_name, training_nr, participant_
         ("TOPPADDING", (0, 1), (-1, 1), 200),
     ])
 
-
     return res
 
 
-def _gen_meta_data(participant_name, training_name, training_nr, month, data, date_ranges):
+def _gen_meta_data(participant_name, training_name, training_nr, data, date_ranges):
 
     month_names = {}
     month_names[1] = "Januar"
@@ -80,13 +79,10 @@ def _gen_meta_data(participant_name, training_name, training_nr, month, data, da
     min_month_german = month_names[int(min_month)][0:3]
     max_month_german = month_names[int(max_month)][0:3]
 
-    if month == "all":
-        if min_year == max_year:
-            header = f"{header} {min_month_german} bis {max_month_german} {max_year}"
-        else:
-            header = f"{header} {min_month_german} {min_year} bis {max_month_german} {max_year}"
+    if min_year == max_year:
+        header = f"{header} {min_month_german} bis {max_month_german} {max_year}"
     else:
-        header = f"{header} {month_names[month]} {max_year}"
+        header = f"{header} {min_month_german} {min_year} bis {max_month_german} {max_year}"
 
     res = Table([
         [header],

@@ -1,5 +1,6 @@
 import datetime
 import os
+import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
@@ -59,6 +60,9 @@ class BeginnerLuftGUI(tk.Tk):
         self.file_ze_coach = ""
         self.file_ze_beginnerluft = ""
 
+        self.txt_preview = None
+        self.checkbutton_list = []
+
         self.frame_intro = ttk.Frame(self, style="Intro.TFrame")
         self.active_frame = self.frame_intro
         self.nav_frame = ttk.Frame(self)
@@ -80,14 +84,10 @@ class BeginnerLuftGUI(tk.Tk):
 
     def choose_file(self, event, filetype, textvariable):
 
-        filename = askopenfilename(initialdir=os.getcwd(), title="Dateiauswahl")
-        print("test")
-        print(filetype)
+        filename = askopenfilename(initialdir=os.getcwd()+"/resources", title="Dateiauswahl")
         if filetype == "coach":
             self.file_ze_coach = filename
             textvariable.set(self.file_ze_coach)
-            print("test2")
-            print(textvariable.get())
         elif filetype == "beginnerluft":
             self.file_ze_beginnerluft = filename
             textvariable.set(self.file_ze_beginnerluft)
@@ -151,11 +151,6 @@ class BeginnerLuftGUI(tk.Tk):
         self.participant_name = self.ent_name.get()
         self.training_name = self.ent_t_name.get()
         self.training_nr = self.ent_t_nr.get()
-        print("-" * 20)
-        print(self.participant_name)
-        print(self.training_nr)
-        print(self.training_name)
-        print("-" * 20)
 
     def collection_placeholder(self, event):
         print("PLACEHOLDER")
@@ -297,7 +292,7 @@ class BeginnerLuftGUI(tk.Tk):
         self.active_frame = ttk.Frame(self, style="Intro.TFrame")
         self.active_frame.grid(row=1, column=0, sticky="nsew")
         self.active_frame.grid_columnconfigure(0, weight=10)
-        self.active_frame.grid_columnconfigure(1, weight=10)
+        self.active_frame.grid_columnconfigure(1, weight=20)
         self.active_frame.grid_columnconfigure(2, weight=1)
         for i in range(5):
             self.active_frame.grid_rowconfigure(i, weight=1)
@@ -308,43 +303,47 @@ class BeginnerLuftGUI(tk.Tk):
         lbl_time_period = ttk.Label(self.active_frame, text="Wähle Zeitraum", style="OverviewHeader.TLabel")
         lbl_time_period.grid(row=0, column=0, sticky="nwe", pady=(20,0), padx=(60,0))
 
-        # create a place checkbuttons
+        # create and place checkbuttons
         frame_time_period = ttk.Frame(self.active_frame, style="Intro.TFrame")
         frame_time_period.grid(row=1, column=0, sticky = "nsew")
-        checkbutton_list = self.create_checkbuttons(frame=frame_time_period)
+        self.checkbutton_list = self.create_checkbuttons(frame=frame_time_period)
         frame_time_period.grid_columnconfigure(0, weight=1)
-        for i, checkbutton in enumerate(checkbutton_list):
+        for i, checkbutton in enumerate(self.checkbutton_list):
             frame_time_period.grid_rowconfigure(i, weight=1)
-            checkbutton.grid(row=1 + i, column=0, sticky="w", padx=(60,0))
+            checkbutton.grid(row=1 + i, column=0, sticky="nw", padx=(60,0))
+            checkbutton.var.set(1)  # turns on all checkbuttons
 
-        checkbutton_list[-2].var.set(1)  # turns on the latest available month
-
+        #  Data preview window
         lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
         lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
-        txt = tk.Text(self.active_frame, width=30, height=10)
-        txt.grid(row=1, column=1, sticky="news", padx=(10,10))
+        self.txt_preview = tk.Text(self.active_frame, width=30, height=10)
+        self.txt_preview.grid(row=1, column=1, sticky="news", padx=(10,10))
 
         # insert dataframe content as a preview to user into text field
-        txt.delete("1.0", tk.END)
-        df = self.report.df
+        self.txt_preview.delete("1.0", tk.END)
+        df = self.report.filtered_df.copy()
         df.set_index("Datum", inplace=True)
-        txt.insert(tk.END, df)
+        self.txt_preview.insert(tk.END, df)
 
-        scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=txt.yview)
+        scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=self.txt_preview.yview)
         scrollbar.grid(row=1, column=2, sticky="ns", padx=(0,10))
-        txt['yscrollcommand'] = scrollbar.set  #  communicate back to the scrollbar
+        self.txt_preview['yscrollcommand'] = scrollbar.set  #  communicate back to the scrollbar
 
-        lbl_create_report = ttk.Label(self.active_frame, text="Erstelle Report", style="OverviewHeader.TLabel",
+        lbl_create_report = ttk.Label(self.active_frame, text="Report erstellen!", style="OverviewHeader.TLabel",
                                       anchor=tk.CENTER)
-        lbl_create_report.grid(row=3, column=1, sticky="new", padx=(10, 0))
+        lbl_create_report.grid(row=3, column=1, sticky="ew", padx=(10, 0))
         lbl_create_report.bind("<Enter>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_enter(event, label_widget))
         lbl_create_report.bind("<Leave>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_leave(event, label_widget))
         lbl_create_report.bind("<Button-1>", self.create_report)
+
         self.create_button_back(row=4, collection_function=self.collection_placeholder,
                                 nav_function=self.create_menu_data_overview)
 
     def create_report(self, event):
-        directory = askdirectory()
+
+        # ask user for an output directory
+        directory = askdirectory(initialdir=os.path.join(os.getcwd(), "reports"))
+
         success = self.report.create_report(output_directory=directory)
         if success:
             messagebox.showinfo(title="BeginnerLuft Zeiterfassung",
@@ -353,6 +352,34 @@ class BeginnerLuftGUI(tk.Tk):
             messagebox.showerror(title="BeginnerLuft Zeiterfassung",
                                  message=f"Zeiterfassungsreport für {self.participant_name} konnte nicht erstellt werden.")
 
+    def change_preview(self, event, btn):
+        # determine selected months
+        months = []
+        # btn.var.set(1)
+        for btn in self.checkbutton_list:
+            if (btn.instate(["selected"]) or btn.instate(["active"])) and btn.state() != ('active', 'focus', 'pressed', 'selected', 'hover'):
+                months.append(btn.cget("text")[0:2])
+
+        months = [int(month) for month in months]
+
+        # filter dataframe
+        self.report.filter_df(months=months)
+
+        # insert dataframe content as a preview to user into text field
+        self.txt_preview.delete("1.0", tk.END)
+
+        # insert filtered data only if filtered dataframe has data in it
+        if not self.report.filtered_df.empty:
+            df = self.report.filtered_df.copy()
+            df.set_index("Datum", inplace=True)
+            self.txt_preview.insert(tk.END, df)
+
+        scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=self.txt_preview.yview)
+        scrollbar.grid(row=1, column=2, sticky="ns", padx=(0,10))
+        self.txt_preview['yscrollcommand'] = scrollbar.set  #  communicate back to the scrollbar
+
+
+
     def create_checkbuttons(self, frame):
 
         # output / return value
@@ -360,11 +387,7 @@ class BeginnerLuftGUI(tk.Tk):
 
         # get unique dates
         dates = self.report.df["Datum"].unique()
-
-        # parse them to datetime and then format them
-        parsed_dates = [datetime.datetime.strptime(date, "%d.%m.%y") for date in dates]
-        parsed_dates.sort()
-        formatted_dates = [date.strftime("%m/%Y") for date in parsed_dates]
+        formatted_dates = [pd.to_datetime(str(date)).strftime("%m/%Y") for date in dates]
 
         # keep only unique month/year combinations
         final_dates = set(formatted_dates)
@@ -378,15 +401,17 @@ class BeginnerLuftGUI(tk.Tk):
         for i, date in enumerate(final_formatted_dates):
             var = tk.IntVar()
             cbtn = ttk.Checkbutton(frame, text=date, variable=var, style="TCheckbutton")
+            cbtn.bind("<ButtonRelease-1>", lambda event, btn=cbtn: self.change_preview(event, btn=btn))
             cbtn.state(['!alternate'])  # remove alternate selected state
             cbtn.var = var  # attach variable to checkbutton
             checkbutton_list.append(cbtn)
 
-        var = tk.IntVar()
-        cbtn = ttk.Checkbutton(frame, text="Gesamter Zeitraum", variable=var, style="TCheckbutton")
-        cbtn.state(['!alternate'])  # remove alternate selected state
-        cbtn.var = var  # attach variable to checkbutton
-        checkbutton_list.append(cbtn)
+        # var = tk.IntVar()
+        # cbtn = ttk.Checkbutton(frame, text="Gesamter Zeitraum", variable=var, style="TCheckbutton")
+        # cbtn.bind("<ButtonRelease-1>", lambda event, btn=cbtn: self.change_preview(event, btn=btn))
+        # cbtn.state(['!alternate'])  # remove alternate selected state
+        # cbtn.var = var  # attach variable to checkbutton
+        # checkbutton_list.append(cbtn)
 
         return checkbutton_list
 

@@ -20,13 +20,15 @@ class TimeReport():
         self.df_coach = pd.DataFrame()
         self.df_beginnerluft = pd.DataFrame()
         self.df = pd.DataFrame()
+        self.filtered_df = pd.DataFrame()
         self.date_ranges = None
         self.output_matrix = []
+        self.month_selection = []
 
         self._get_data()
         self._filter_df()
         self._determine_date_range()
-        self._create_df_matrix()
+        # self._create_df_matrix()
 
 
     def _get_data(self):
@@ -43,32 +45,41 @@ class TimeReport():
 
         self.df["UE"] = self.df["UE"].fillna(0)  # fill UE with zero if cell is empty
         self.df = self.df.fillna("")
+        self.filtered_df = self.df.copy()
 
+    def filter_df(self, months):
 
-    def _filter_df(self, month="all"):
+        # filter dataframe for specific date range and update output matrix
+        self._filter_df(month_selection=months)
+        self._determine_date_range()
+        # self._create_df_matrix()
+
+    def _filter_df(self, month_selection="all"):
 
         # filter dataframe for specific date range
-        if month != "all":
-            self.df = self.df[self.df["Datum"].dt.month == month]
+        # self.df["Datum"] = pd.to_datetime(self.df["Datum"])
+        if month_selection != "all":
+            self.filtered_df = self.df[self.df["Datum"].dt.month.isin(month_selection)]
 
     def _determine_date_range(self):
 
-        # locale.setlocale(locale.LC_TIME, locale.normalize("de"))  # does not work
-        first_date = datetime.datetime.strftime(min(self.df["Datum"]), "%m/%Y")
-        last_date = datetime.datetime.strftime(max(self.df["Datum"]), "%m/%Y")
-        date_range = [first_date, last_date]
-        self.date_ranges = date_range
+        if not self.filtered_df.empty:
+            # locale.setlocale(locale.LC_TIME, locale.normalize("de"))  # does not work
+            first_date = datetime.datetime.strftime(min(self.filtered_df["Datum"]), "%m/%Y")
+            last_date = datetime.datetime.strftime(max(self.filtered_df["Datum"]), "%m/%Y")
+            date_range = [first_date, last_date]
+            self.date_ranges = date_range
 
     def _create_df_matrix(self):
-        sum_ues = "{:.0f}".format(self.df["UE"].sum())
-        self.df['Datum'] = self.df['Datum'].apply(lambda x: x.strftime("%d.%m.%y"))
-        self.df['Von'] = self.df['Von'].apply(lambda x: x.strftime("%H:%M") if isinstance(x, datetime.datetime) else x)
-        self.df['Bis'] = self.df['Bis'].apply(lambda x: x.strftime("%H:%M") if isinstance(x, datetime.datetime) else x)
-        self.df['UE'] = self.df['UE'].apply(lambda x: "{:.0f}".format(x))
+        sum_ues = "{:.0f}".format(self.filtered_df["UE"].sum())
+        self.filtered_df.loc[:, 'Datum'] = self.filtered_df['Datum'].apply(lambda x: x.strftime("%d.%m.%y"))
+        self.filtered_df.loc[:, 'Von'] = self.filtered_df['Von'].apply(lambda x: x.strftime("%H:%M") if isinstance(x, datetime.datetime) else x)
+        self.filtered_df.loc[:, 'Bis'] = self.filtered_df['Bis'].apply(lambda x: x.strftime("%H:%M") if isinstance(x, datetime.datetime) else x)
+        self.filtered_df.loc[:, 'UE'] = self.filtered_df['UE'].apply(lambda x: "{:.0f}".format(x))
 
 
-        matrix = self.df.values.tolist()
-        matrix.insert(0, self.df.columns)  # header of dataframe
+        matrix = self.filtered_df.values.tolist()
+        matrix.insert(0, self.filtered_df.columns)  # header of dataframe
         matrix.append(["", "", "", sum_ues, ""])
 
         # ensure that matrix always has the same length and is printed from top to bottom (workaround)
@@ -92,11 +103,14 @@ class TimeReport():
                 0.05 * height  # footer
                 ]
 
+            # create output matrix
+            self._create_df_matrix()
+
             main_table = Table([
                 [gen_header_table(width=width, height=height_list[0])],
                 [gen_body_table(width=width, height=height_list[1], data=self.output_matrix,
                                 training_name=self.gui.training_name, training_nr=self.gui.training_nr,
-                                participant_name=self.gui.participant_name, month="all", date_ranges=self.date_ranges)],
+                                participant_name=self.gui.participant_name, date_ranges=self.date_ranges)],
                 [gen_footer_table(width=width, height=height_list[2])]
             ],
                 colWidths=width,
