@@ -25,7 +25,7 @@ class BeginnerLuftGUI(tk.Tk):
         self.style.configure("Nav.TLabel", justify="CENTER", background="lightgrey", foreground="black",
                              font=("Times New Roman", 12, "bold"))
         self.style.configure("BackForw.TLabel", background="yellow", foreground="black",
-                             font=("Times New Roman", 10, "bold"))
+                             font=("Times New Roman", 12, "bold"))
         self.style.configure("Inactive.Nav.TLabel", justify="CENTER", background="lightgrey", foreground="grey",
                              font=("Times New Roman", 12))
         self.style.configure("Data.TLabel", justify="CENTER", background="yellow", foreground="black",
@@ -437,7 +437,7 @@ class BeginnerLuftGUI(tk.Tk):
 
     def create_button_back(self, row, collection_function, nav_function):
         lbl_back = ttk.Label(self.active_frame, text="<<< Zurück", style="BackForw.TLabel")
-        lbl_back.grid(row=row, column=0, sticky="sw", pady=5, padx=10)
+        lbl_back.grid(row=row, column=0, sticky="sw", pady=7, padx=10)
         lbl_back.bind("<Button-1>", func=collection_function, add="+")
         lbl_back.bind("<Button-1>", func=nav_function, add="+")
         lbl_back.bind("<Enter>", func=lambda event, label_widget=lbl_back: self.lbl_on_enter(event, label_widget))
@@ -445,7 +445,7 @@ class BeginnerLuftGUI(tk.Tk):
 
     def create_button_forward(self, row, column, collection_function, nav_function):
         lbl_forward = ttk.Label(self.active_frame, text="Vor >>>", style="BackForw.TLabel")
-        lbl_forward.grid(row=row, column=column, sticky="se", pady=5, padx=10)
+        lbl_forward.grid(row=row, column=column, sticky="se", pady=7, padx=10)
         lbl_forward.bind("<Button-1>", func=collection_function, add="+")
         lbl_forward.bind("<Button-1>", func=nav_function, add="+")
         lbl_forward.bind("<Enter>", func=lambda event, label_widget=lbl_forward: self.lbl_on_enter(event, label_widget))

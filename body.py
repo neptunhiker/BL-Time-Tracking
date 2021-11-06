@@ -14,7 +14,7 @@ def gen_body_table(width, height, data, training_name, training_nr, participant_
         0.8 * width,
         0.1 * width,
         ]
-    print(len(data))
+
     height_list = [
         0.15 * height,
         0.6 * height,
