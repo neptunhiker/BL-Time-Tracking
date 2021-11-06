@@ -4,6 +4,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import asksaveasfilename
 from tkinter.filedialog import askdirectory
 from tkinter import messagebox
 
@@ -348,11 +349,15 @@ class BeginnerLuftGUI(tk.Tk):
 
     def create_report(self, event):
 
-        # ask user for an output directory
-        directory = askdirectory(initialdir=os.path.join(os.getcwd(), "reports"))
+        # directory = askdirectory(initialdir=os.path.join(os.getcwd(), "reports"))
+        filename = f"BeginnerLuft Zeiterfassung {self.participant_name}"
+        filename = filename.rstrip()
+        filename = filename + ".pdf"
+        path = asksaveasfilename(title="BeginnerLuft Zeiterfassung", initialdir=os.path.join(os.getcwd(), "reports"),
+                                 initialfile=filename, filetypes=(("pdf", "*.pdf"), ))
 
         if not self.report.error:
-            success = self.report.create_report(output_directory=directory)
+            success = self.report.create_report(path)
         else:
             success = False
 

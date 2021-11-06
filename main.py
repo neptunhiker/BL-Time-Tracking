@@ -108,13 +108,13 @@ class TimeReport():
 
         self.output_matrix = matrix
 
-    def create_report(self, output_directory):
+    def create_report(self, path):
 
         try:
-            filename = f"BeginnerLuft Zeiterfassung {self.gui.participant_name}.pdf"
-            path = os.path.join(output_directory, filename)
+            # filename = f"BeginnerLuft Zeiterfassung {self.gui.participant_name}.pdf"
+            # path = os.path.join(output_directory, filename)
             pdf = canvas.Canvas(path, pagesize=A4)
-            pdf.setTitle(filename)
+            pdf.setTitle("BeginnerLuft Zeiterfassung")
 
             width, height = A4  # A$ is a tuple with two values (width, height)
             height_list = [
