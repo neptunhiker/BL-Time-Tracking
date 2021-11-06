@@ -30,7 +30,7 @@ class BeginnerLuftGUI(tk.Tk):
         self.style.configure("Inactive.Nav.TLabel", justify="CENTER", background="lightgrey", foreground="grey",
                              font=("Times New Roman", 12))
         self.style.configure("Data.TLabel", justify="CENTER", background="yellow", foreground="black",
-                             font=("Times New Roman", 12))
+                             font=("Times New Roman", 12, "bold"))
         self.style.configure("ZE.TLabel", anchor="center", background="yellow", foreground="black",
                              font=("Times New Roman", 14, "bold"))
         self.style.configure("Filename.TLabel", anchor="center", background="yellow", foreground="black",
@@ -40,9 +40,9 @@ class BeginnerLuftGUI(tk.Tk):
         self.style.configure("OverviewHeader.TLabel", background="yellow", foreground="black", justify="left",
                              font=("Times New Roman", 14, "bold"))
         self.style.configure("OverviewLeft.TLabel", background="yellow", foreground="black", justify="right",
-                             font=("Times New Roman", 10, "bold"))
+                             font=("Times New Roman", 12, "bold"))
         self.style.configure("OverviewRight.TLabel", background="yellow", foreground="black", justify="left",
-                             font=("Times New Roman", 10), wraplength=300)
+                             font=("Times New Roman", 12), wraplength=400)
         self.style.configure("Data.TEntry", width=60)
         self.style.configure("TCheckbutton", background="yellow", foreground="black", font=("Times New Roman", 10))
 
@@ -58,8 +58,8 @@ class BeginnerLuftGUI(tk.Tk):
         self.ent_t_name = None
         self.ent_t_nr = None
 
-        self.file_ze_coach = ""
-        self.file_ze_beginnerluft = ""
+        self.file_ze_coach = "- noch keine Datei ausgewählt -"
+        self.file_ze_beginnerluft = "- noch keine Datei ausgewählt -"
 
         self.txt_preview = None
         self.checkbutton_list = []
@@ -121,31 +121,34 @@ class BeginnerLuftGUI(tk.Tk):
         self.active_frame.grid(row=1, column=0, sticky="nsew")
         self.active_frame.grid_columnconfigure(0, weight=1)
         self.active_frame.grid_columnconfigure(1, weight=1)
-        for i in range(3):
+        for i in range(4):
             self.active_frame.grid_rowconfigure(i, weight=1)
 
+        lbl_header = ttk.Label(self.active_frame, text="Stammdaten", style="OverviewHeader.TLabel")
+        lbl_header.grid(row=0, column=1, sticky="sw", padx=(20,0))
+
         lbl_name = ttk.Label(self.active_frame, text="Teilnehmer:in", style="Data.TLabel")
-        lbl_name.grid(row=0, column=0, sticky="se")
+        lbl_name.grid(row=1, column=0, sticky="se")
         self.ent_name = ttk.Entry(self.active_frame, style="Data.TEntry", width=30)
         self.set_entry_text(self.ent_name, self.participant_name)
-        self.ent_name.grid(row=0, column=1, sticky="sw", padx=(20, 0))
+        self.ent_name.grid(row=1, column=1, sticky="sw", padx=(20, 0))
 
         lbl_training_name = ttk.Label(self.active_frame, text="Maßnahmenbezeichnung", style="Data.TLabel")
-        lbl_training_name.grid(row=1, column=0, sticky="e")
+        lbl_training_name.grid(row=2, column=0, sticky="e")
         self.ent_t_name = ttk.Entry(self.active_frame, style="Data.TEntry", width=30)
         self.set_entry_text(self.ent_t_name, self.training_name)
-        self.ent_t_name.grid(row=1, column=1, sticky="w", padx=(20, 0))
+        self.ent_t_name.grid(row=2, column=1, sticky="w", padx=(20, 0))
 
         lbl_training_nr = ttk.Label(self.active_frame, text="Maßnahmennummer", style="Data.TLabel")
-        lbl_training_nr.grid(row=2, column=0, sticky="ne")
+        lbl_training_nr.grid(row=3, column=0, sticky="ne")
         self.ent_t_nr = ttk.Entry(self.active_frame, style="Data.TEntry", width=30)
         self.set_entry_text(self.ent_t_nr, self.training_nr)
-        self.ent_t_nr.grid(row=2, column=1, sticky="nw", padx=(20, 0))
+        self.ent_t_nr.grid(row=3, column=1, sticky="nw", padx=(20, 0))
 
         # back and forward button
-        self.create_button_back(row=3, collection_function=self.collection_data,
+        self.create_button_back(row=4, collection_function=self.collection_data,
                                 nav_function=self.create_menu_functions)
-        self.create_button_forward(row=3, column=1, collection_function=self.collection_data,
+        self.create_button_forward(row=4, column=1, collection_function=self.collection_data,
                                    nav_function=self.create_menu_ze_coach)
 
     def collection_data(self, event):
@@ -182,7 +185,7 @@ class BeginnerLuftGUI(tk.Tk):
         lbl_file_picker.bind("<Enter>", func=lambda event, label_widget=lbl_file_picker: self.lbl_on_enter(event, label_widget))
         lbl_file_picker.bind("<Leave>", func=lambda event, label_widget=lbl_file_picker: self.lbl_on_leave(event, label_widget))
 
-        lbl_file_name = ttk.Label(self.active_frame, text="hi", textvariable=var_ze_coach, style="Filename.TLabel")
+        lbl_file_name = ttk.Label(self.active_frame, textvariable=var_ze_coach, style="Filename.TLabel")
         lbl_file_name.grid(row=1, column=0, columnspan=2, sticky="ew")
 
         # to be continued: write function that checks whether selected file is an excel and has a dataframe with
@@ -340,7 +343,7 @@ class BeginnerLuftGUI(tk.Tk):
 
         else:
 
-            lbl_error = ttk.Label(self.active_frame, text="-- Fehler --\n\nBitte Dateninput kontrollieren!",
+            lbl_error = ttk.Label(self.active_frame, text="-- Fehler --\n\nBitte Datenübersicht kontrollieren!",
                                   style="OverviewHeader.TLabel", anchor=tk.CENTER, justify="center")
             lbl_error.grid(row=2, column=0, columnspan=2, sticky="ew")
 

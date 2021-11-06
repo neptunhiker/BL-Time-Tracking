@@ -1,8 +1,5 @@
 GUI
-- Let user choose which columns to include in output report
 - Write into large pdf
-- Automatically create a useful 
-- Let user choose the output file name
 
 Commenting code
 Watch final episodes of udemy course
