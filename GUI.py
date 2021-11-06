@@ -319,7 +319,8 @@ class BeginnerLuftGUI(tk.Tk):
                 checkbutton.var.set(1)  # turns on all checkbuttons
 
             #  Data preview window
-            lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
+            lbl_preview = ttk.Label(self.active_frame, text=f"Datenvorschau für Teilnehmer:in {self.participant_name}",
+                                    style="OverviewHeader.TLabel", anchor=tk.CENTER)
             lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
             self.txt_preview = tk.Text(self.active_frame, width=30, height=10)
             self.txt_preview.grid(row=1, column=1, sticky="news", padx=(10,10))
