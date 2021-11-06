@@ -300,41 +300,48 @@ class BeginnerLuftGUI(tk.Tk):
         # prepare the report
         self.report = TimeReport(gui=self)
 
-        lbl_time_period = ttk.Label(self.active_frame, text="Wähle Zeitraum", style="OverviewHeader.TLabel")
-        lbl_time_period.grid(row=0, column=0, sticky="nwe", pady=(20,0), padx=(60,0))
+        if not self.report.error:
+            lbl_time_period = ttk.Label(self.active_frame, text="Wähle Zeitraum", style="OverviewHeader.TLabel")
+            lbl_time_period.grid(row=0, column=0, sticky="nwe", pady=(20,0), padx=(60,0))
 
-        # create and place checkbuttons
-        frame_time_period = ttk.Frame(self.active_frame, style="Intro.TFrame")
-        frame_time_period.grid(row=1, column=0, sticky = "nsew")
-        self.checkbutton_list = self.create_checkbuttons(frame=frame_time_period)
-        frame_time_period.grid_columnconfigure(0, weight=1)
-        for i, checkbutton in enumerate(self.checkbutton_list):
-            frame_time_period.grid_rowconfigure(i, weight=1)
-            checkbutton.grid(row=1 + i, column=0, sticky="nw", padx=(60,0))
-            checkbutton.var.set(1)  # turns on all checkbuttons
+            # create and place checkbuttons
+            frame_time_period = ttk.Frame(self.active_frame, style="Intro.TFrame")
+            frame_time_period.grid(row=1, column=0, sticky = "nsew")
+            self.checkbutton_list = self.create_checkbuttons(frame=frame_time_period)
+            frame_time_period.grid_columnconfigure(0, weight=1)
+            for i, checkbutton in enumerate(self.checkbutton_list):
+                frame_time_period.grid_rowconfigure(i, weight=1)
+                checkbutton.grid(row=1 + i, column=0, sticky="nw", padx=(60,0))
+                checkbutton.var.set(1)  # turns on all checkbuttons
 
-        #  Data preview window
-        lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
-        lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
-        self.txt_preview = tk.Text(self.active_frame, width=30, height=10)
-        self.txt_preview.grid(row=1, column=1, sticky="news", padx=(10,10))
+            #  Data preview window
+            lbl_preview = ttk.Label(self.active_frame, text="Datenvorschau", style="OverviewHeader.TLabel", anchor=tk.CENTER)
+            lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
+            self.txt_preview = tk.Text(self.active_frame, width=30, height=10)
+            self.txt_preview.grid(row=1, column=1, sticky="news", padx=(10,10))
 
-        # insert dataframe content as a preview to user into text field
-        self.txt_preview.delete("1.0", tk.END)
-        df = self.report.filtered_df.copy()
-        df.set_index("Datum", inplace=True)
-        self.txt_preview.insert(tk.END, df)
+            # insert dataframe content as a preview to user into text field
+            self.txt_preview.delete("1.0", tk.END)
+            df = self.report.filtered_df.copy()
+            df.set_index("Datum", inplace=True)
+            self.txt_preview.insert(tk.END, df)
 
-        scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=self.txt_preview.yview)
-        scrollbar.grid(row=1, column=2, sticky="ns", padx=(0,10))
-        self.txt_preview['yscrollcommand'] = scrollbar.set  #  communicate back to the scrollbar
+            scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=self.txt_preview.yview)
+            scrollbar.grid(row=1, column=2, sticky="ns", padx=(0,10))
+            self.txt_preview['yscrollcommand'] = scrollbar.set  #  communicate back to the scrollbar
 
-        lbl_create_report = ttk.Label(self.active_frame, text="Report erstellen!", style="OverviewHeader.TLabel",
-                                      anchor=tk.CENTER)
-        lbl_create_report.grid(row=3, column=1, sticky="ew", padx=(10, 0))
-        lbl_create_report.bind("<Enter>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_enter(event, label_widget))
-        lbl_create_report.bind("<Leave>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_leave(event, label_widget))
-        lbl_create_report.bind("<Button-1>", self.create_report)
+            lbl_create_report = ttk.Label(self.active_frame, text="Report erstellen!", style="OverviewHeader.TLabel",
+                                          anchor=tk.CENTER)
+            lbl_create_report.grid(row=3, column=1, sticky="ew", padx=(10, 0))
+            lbl_create_report.bind("<Enter>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_enter(event, label_widget))
+            lbl_create_report.bind("<Leave>", func=lambda event, label_widget=lbl_create_report: self.lbl_on_leave(event, label_widget))
+            lbl_create_report.bind("<Button-1>", self.create_report)
+
+        else:
+
+            lbl_error = ttk.Label(self.active_frame, text="-- Fehler --\n\nBitte Dateninput kontrollieren!",
+                                  style="OverviewHeader.TLabel", anchor=tk.CENTER, justify="center")
+            lbl_error.grid(row=2, column=0, columnspan=2, sticky="ew")
 
         self.create_button_back(row=4, collection_function=self.collection_placeholder,
                                 nav_function=self.create_menu_data_overview)
@@ -344,7 +351,11 @@ class BeginnerLuftGUI(tk.Tk):
         # ask user for an output directory
         directory = askdirectory(initialdir=os.path.join(os.getcwd(), "reports"))
 
-        success = self.report.create_report(output_directory=directory)
+        if not self.report.error:
+            success = self.report.create_report(output_directory=directory)
+        else:
+            success = False
+
         if success:
             messagebox.showinfo(title="BeginnerLuft Zeiterfassung",
                                 message=f"Zeiterfassungsreport für {self.participant_name} erstellt.")

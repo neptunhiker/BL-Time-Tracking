@@ -24,28 +24,48 @@ class TimeReport():
         self.date_ranges = None
         self.output_matrix = []
         self.month_selection = []
+        self.error = False
 
         self._get_data()
-        self._filter_df()
-        self._determine_date_range()
-        # self._create_df_matrix()
 
+        if not self.error:
+            self._filter_df()
+            self._determine_date_range()
 
     def _get_data(self):
 
         # get times of coachings conducted by BeginnerLuft
-        self.df_coach = pd.read_excel(self.gui.file_ze_coach)
-        self.df_beginnerluft =pd.read_excel(self.gui.file_ze_beginnerluft)
+        try:
+            self.df_coach = pd.read_excel(self.gui.file_ze_coach)
+        except FileNotFoundError as err:
+            print(err)
+            pass
+        except Exception as err:
+            print(err)
+            raise Exception
 
-        # concatenate the two data frames
-        self.df = pd.concat([self.df_beginnerluft, self.df_coach], ignore_index=True)
+        try:
+            self.df_beginnerluft = pd.read_excel(self.gui.file_ze_beginnerluft)
+        except FileNotFoundError as err:
+            print(err)
+        except Exception as err:
+            print(err)
+            raise Exception
 
-        # sort dataframe by date
-        self.df.sort_values(by=["Datum"], inplace=True)
+        try:
+            # concatenate the two data frames
+            self.df = pd.concat([self.df_beginnerluft, self.df_coach], ignore_index=True)
 
-        self.df["UE"] = self.df["UE"].fillna(0)  # fill UE with zero if cell is empty
-        self.df = self.df.fillna("")
-        self.filtered_df = self.df.copy()
+            # sort dataframe by date
+            self.df.sort_values(by=["Datum"], inplace=True)
+
+            self.df["UE"] = self.df["UE"].fillna(0)  # fill UE with zero if cell is empty
+            self.df = self.df.fillna("")
+            self.filtered_df = self.df.copy()
+
+        except Exception as err:
+            print(err)
+            self.error = True
 
     def filter_df(self, months):
 

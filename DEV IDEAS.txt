@@ -1,10 +1,8 @@
 GUI
-- Let user choose the name and two input files
 - Let user choose which columns to include in output report
 - Write into large pdf
-- Let user choose the output location
 - Let user choose the output file name
+- make the program work also only with one file
 
 Commenting code
-
 Watch final episodes of udemy course
