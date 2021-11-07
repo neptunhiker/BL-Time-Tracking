@@ -330,9 +330,11 @@ class BeginnerLuftGUI(tk.Tk):
 
             # insert dataframe content as a preview to user into text field
             self.txt_preview.delete("1.0", tk.END)
-            df = self.report.filtered_df.copy()
-            df.set_index("Datum", inplace=True)
-            self.txt_preview.insert(tk.END, df)
+            if not self.report.filtered_df.empty:
+                df = self.report.filtered_df.copy()
+                df = self.format_df(df)  # to be continued: does not work due to formatting to string somewhere else
+                df.set_index("Datum", inplace=True)
+                self.txt_preview.insert(tk.END, df)
 
             scrollbar = ttk.Scrollbar(self.active_frame, orient="vertical", command=self.txt_preview.yview)
             scrollbar.grid(row=1, column=2, sticky="ns", padx=(0,10))
@@ -402,6 +404,7 @@ class BeginnerLuftGUI(tk.Tk):
         # insert filtered data only if filtered dataframe has data in it
         if not self.report.filtered_df.empty:
             df = self.report.filtered_df.copy()
+            df = self.format_df(df)  # to be continued: does not work due to formatting to str somewhere before
             df.set_index("Datum", inplace=True)
             self.txt_preview.insert(tk.END, df)
 
@@ -506,6 +509,15 @@ class BeginnerLuftGUI(tk.Tk):
     def set_entry_text(self, the_widget, text):
         the_widget.delete(0, tk.END)
         the_widget.insert(0, text)
+
+    def format_df(self, df):
+
+        df.loc[:, 'Datum'] = df['Datum'].apply(lambda x: x.strftime("%d.%m.%y"))
+        # df.loc[:, 'Von'] = df['Von'].apply(lambda x: x.strftime("%H:%M") if isinstance(x, pd.datetime) else x)
+        # df.loc[:, 'Bis'] = df['Bis'].apply(lambda x: x.strftime("%H:%M") if pd.notnull(x) else x)
+        df.loc[:, 'UE'] = df['UE'].apply(lambda x: "{:.0f}".format(x))
+
+        return df
 
 
 class TopLevel(tk.Toplevel):
