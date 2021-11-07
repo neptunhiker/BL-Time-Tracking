@@ -36,7 +36,12 @@ class TimeReport():
 
         # get times of coachings conducted by BeginnerLuft
         try:
-            self.df_coach = pd.read_excel(self.gui.file_ze_coach)
+            if int(pd.__version__[2:4]) < 21:
+                self.df_coach = pd.read_excel(self.gui.file_ze_coach, sheetname="Zeiterfassung")
+            else:
+                self.df_coach = pd.read_excel(self.gui.file_ze_coach, sheet_name="Zeiterfassung")
+            self.df_coach.dropna(how="all", inplace=True)
+            self.df_coach = self.df_coach[["Datum", "Von", "Bis", "UE", "Kommentar bei Terminabsage"]]
         except FileNotFoundError as err:
             print(err)
             pass
@@ -45,12 +50,23 @@ class TimeReport():
             raise Exception
 
         try:
-            self.df_beginnerluft = pd.read_excel(self.gui.file_ze_beginnerluft)
+            if int(pd.__version__[2:4]) < 21:
+                self.df_beginnerluft = pd.read_excel(self.gui.file_ze_beginnerluft, sheetname="Zeiterfassung")
+            else:
+                self.df_beginnerluft = pd.read_excel(self.gui.file_ze_beginnerluft, sheet_name="Zeiterfassung")
+            self.df_beginnerluft.dropna(how="all", inplace=True)
+            self.df_beginnerluft = self.df_beginnerluft[["Datum", "Von", "Bis", "UE", "Kommentar bei Terminabsage"]]
         except FileNotFoundError as err:
             print(err)
         except Exception as err:
             print(err)
             raise Exception
+
+        print(self.df_coach)
+
+        # rename columns
+        for df in [self.df_coach, self.df_beginnerluft]:
+            df.rename(columns={"Kommentar bei Terminabsage": "Kommentar"}, inplace=True)
 
         try:
             # concatenate the two data frames

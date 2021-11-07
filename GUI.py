@@ -17,6 +17,9 @@ class BeginnerLuftGUI(tk.Tk):
     def __init__(self):
         super(BeginnerLuftGUI, self).__init__()
         self.title("BeginnerLuft")
+
+        pd.set_option('display.expand_frame_repr', False)
+
         self.style = ttk.Style(self)
         self.style.configure("Intro.TFrame", background="yellow")
         self.style.configure("Functions.TFrame", background="red")
@@ -46,7 +49,7 @@ class BeginnerLuftGUI(tk.Tk):
         self.style.configure("Data.TEntry", width=60)
         self.style.configure("TCheckbutton", background="yellow", foreground="black", font=("Times New Roman", 10))
 
-        self.geometry("800x400")
+        self.geometry("900x400")
 
         self.report = None
 
@@ -295,7 +298,7 @@ class BeginnerLuftGUI(tk.Tk):
 
         self.active_frame = ttk.Frame(self, style="Intro.TFrame")
         self.active_frame.grid(row=1, column=0, sticky="nsew")
-        self.active_frame.grid_columnconfigure(0, weight=10)
+        self.active_frame.grid_columnconfigure(0, weight=5)
         self.active_frame.grid_columnconfigure(1, weight=20)
         self.active_frame.grid_columnconfigure(2, weight=1)
         for i in range(5):
@@ -322,7 +325,7 @@ class BeginnerLuftGUI(tk.Tk):
             lbl_preview = ttk.Label(self.active_frame, text=f"Datenvorschau für Teilnehmer:in {self.participant_name}",
                                     style="OverviewHeader.TLabel", anchor=tk.CENTER)
             lbl_preview.grid(row=0, column=1, sticky="nwe", pady=(20,0))
-            self.txt_preview = tk.Text(self.active_frame, width=30, height=10)
+            self.txt_preview = tk.Text(self.active_frame, width=40, height=10)
             self.txt_preview.grid(row=1, column=1, sticky="news", padx=(10,10))
 
             # insert dataframe content as a preview to user into text field
