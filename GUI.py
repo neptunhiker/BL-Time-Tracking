@@ -56,10 +56,14 @@ class BeginnerLuftGUI(tk.Tk):
         self.participant_name = ""
         self.training_name = "Individuelles Berufscoaching"
         self.training_nr = "962/400/20"
+        self.avgs_nr = ""
+        self.time_period = ""
 
         self.ent_name = None
         self.ent_t_name = None
         self.ent_t_nr = None
+        self.ent_avgs_nr = None
+        self.ent_time_period = None
 
         self.file_ze_coach = "keine Datei ausgewählt"
         self.file_ze_beginnerluft = "keine Datei ausgewählt"
@@ -124,17 +128,17 @@ class BeginnerLuftGUI(tk.Tk):
         self.active_frame.grid(row=1, column=0, sticky="nsew")
         self.active_frame.grid_columnconfigure(0, weight=1)
         self.active_frame.grid_columnconfigure(1, weight=1)
-        for i in range(4):
+        for i in range(6):
             self.active_frame.grid_rowconfigure(i, weight=1)
 
         lbl_header = ttk.Label(self.active_frame, text="Stammdaten", style="OverviewHeader.TLabel")
         lbl_header.grid(row=0, column=1, sticky="sw", padx=(20,0))
 
         lbl_name = ttk.Label(self.active_frame, text="Teilnehmer:in", style="Data.TLabel")
-        lbl_name.grid(row=1, column=0, sticky="se")
+        lbl_name.grid(row=1, column=0, sticky="e")
         self.ent_name = ttk.Entry(self.active_frame, style="Data.TEntry", width=30)
         self.set_entry_text(self.ent_name, self.participant_name)
-        self.ent_name.grid(row=1, column=1, sticky="sw", padx=(20, 0))
+        self.ent_name.grid(row=1, column=1, sticky="w", padx=(20, 0))
 
         lbl_training_name = ttk.Label(self.active_frame, text="Maßnahmenbezeichnung", style="Data.TLabel")
         lbl_training_name.grid(row=2, column=0, sticky="e")
@@ -143,21 +147,36 @@ class BeginnerLuftGUI(tk.Tk):
         self.ent_t_name.grid(row=2, column=1, sticky="w", padx=(20, 0))
 
         lbl_training_nr = ttk.Label(self.active_frame, text="Maßnahmennummer", style="Data.TLabel")
-        lbl_training_nr.grid(row=3, column=0, sticky="ne")
+        lbl_training_nr.grid(row=3, column=0, sticky="e")
         self.ent_t_nr = ttk.Entry(self.active_frame, style="Data.TEntry", width=30)
         self.set_entry_text(self.ent_t_nr, self.training_nr)
-        self.ent_t_nr.grid(row=3, column=1, sticky="nw", padx=(20, 0))
+        self.ent_t_nr.grid(row=3, column=1, sticky="w", padx=(20, 0))
+
+        lbl_avgs_nr = ttk.Label(self.active_frame, text="AVGS-Gutscheinnummer", style="Data.TLabel")
+        lbl_avgs_nr.grid(row=4, column=0, sticky="e")
+        self.ent_avgs_nr = ttk.Entry(self.active_frame, style="Data.TEntry", width=30)
+        self.set_entry_text(self.ent_avgs_nr, self.avgs_nr)
+        self.ent_avgs_nr.grid(row=4, column=1, sticky="w", padx=(20, 0))
+
+        lbl_time_period = ttk.Label(self.active_frame, text="Bewilligungszeitraum", style="Data.TLabel")
+        lbl_time_period.grid(row=5, column=0, sticky="e")
+        self.ent_time_period = ttk.Entry(self.active_frame, style="Data.TEntry", width=30)
+        self.set_entry_text(self.ent_time_period, self.time_period)
+        self.ent_time_period.grid(row=5, column=1, sticky="w", padx=(20, 0))
+
 
         # back and forward button
-        self.create_button_back(row=4, collection_function=self.collection_data,
+        self.create_button_back(row=6, collection_function=self.collection_data,
                                 nav_function=self.create_menu_functions)
-        self.create_button_forward(row=4, column=1, collection_function=self.collection_data,
+        self.create_button_forward(row=6, column=1, collection_function=self.collection_data,
                                    nav_function=self.create_menu_ze_coach)
 
     def collection_data(self, event):
         self.participant_name = self.ent_name.get()
         self.training_name = self.ent_t_name.get()
         self.training_nr = self.ent_t_nr.get()
+        self.avgs_nr = self.ent_avgs_nr.get()
+        self.time_period = self.ent_time_period.get()
 
     def collection_placeholder(self, event):
         print("PLACEHOLDER")
@@ -252,7 +271,7 @@ class BeginnerLuftGUI(tk.Tk):
         self.active_frame.grid(row=1, column=0, sticky="nsew")
         self.active_frame.grid_columnconfigure(0, weight=1)
         self.active_frame.grid_columnconfigure(1, weight=1)
-        for i in range(8):
+        for i in range(10):
             self.active_frame.grid_rowconfigure(i, weight=1)
 
         lbl_overview = ttk.Label(self.active_frame, text="Datenübersicht", style="OverviewHeader.TLabel")
@@ -260,19 +279,24 @@ class BeginnerLuftGUI(tk.Tk):
         lbl_name = ttk.Label(self.active_frame, text="Teilnehmer:in", style="OverviewLeft.TLabel")
         lbl_training_name = ttk.Label(self.active_frame, text="Maßnahmenbezeichnung", style="OverviewLeft.TLabel")
         lbl_training_nr = ttk.Label(self.active_frame, text="Maßnahmennummer", style="OverviewLeft.TLabel")
+        lbl_avgs_nr = ttk.Label(self.active_frame, text="AVGS-Gutscheinnummer", style="OverviewLeft.TLabel")
+        lbl_time_period = ttk.Label(self.active_frame, text="Bewilligungszeitraum", style="OverviewLeft.TLabel")
         lbl_file_ze_coach = ttk.Label(self.active_frame, text="Datei ZE Coach", style="OverviewLeft.TLabel")
         lbl_file_ze_bl = ttk.Label(self.active_frame, text="Datei ZE BeginnerLuft", style="OverviewLeft.TLabel")
 
-        left_hand_labels = [lbl_name, lbl_training_name, lbl_training_nr, lbl_file_ze_coach, lbl_file_ze_bl]
+        left_hand_labels = [lbl_name, lbl_training_name, lbl_training_nr, lbl_avgs_nr, lbl_time_period,
+                            lbl_file_ze_coach, lbl_file_ze_bl]
 
         lbl_real_name = ttk.Label(self.active_frame, text=self.participant_name, style="OverviewRight.TLabel")
         lbl_real_training_name = ttk.Label(self.active_frame, text=self.training_name, style="OverviewRight.TLabel")
         lbl_real_training_nr = ttk.Label(self.active_frame, text=self.training_nr, style="OverviewRight.TLabel")
+        lbl_real_avgs_nr = ttk.Label(self.active_frame, text=self.avgs_nr, style="OverviewRight.TLabel")
+        lbl_real_time_period = ttk.Label(self.active_frame, text=self.time_period, style="OverviewRight.TLabel")
         lbl_real_file_ze_coach = ttk.Label(self.active_frame, text=self.file_ze_coach, style="OverviewRight.TLabel")
         lbl_real_file_ze_bl = ttk.Label(self.active_frame, text=self.file_ze_beginnerluft, style="OverviewRight.TLabel")
 
-        right_hand_labels = [lbl_real_name, lbl_real_training_name, lbl_real_training_nr, lbl_real_file_ze_coach,
-                             lbl_real_file_ze_bl]
+        right_hand_labels = [lbl_real_name, lbl_real_training_name, lbl_real_training_nr, lbl_real_avgs_nr,
+                             lbl_real_time_period, lbl_real_file_ze_coach, lbl_real_file_ze_bl]
 
         lbl_overview.grid(row=0, column=1, sticky="w", pady=(10, 10), padx=(10, 0))
 
