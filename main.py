@@ -119,7 +119,7 @@ class TimeReport():
         matrix.append(["", "", "", sum_ues, ""])
 
         # ensure that matrix always has the same length and is printed from top to bottom (workaround)
-        for i in range(24 - len(matrix)):
+        for i in range(28 - len(matrix)):
             matrix.append(["", "", "", "", ""])
 
         self.output_matrix = matrix
@@ -146,7 +146,8 @@ class TimeReport():
                 [gen_header_table(width=width, height=height_list[0])],
                 [gen_body_table(width=width, height=height_list[1], data=self.output_matrix,
                                 training_name=self.gui.training_name, training_nr=self.gui.training_nr,
-                                participant_name=self.gui.participant_name, date_ranges=self.date_ranges)],
+                                participant_name=self.gui.participant_name, avgs_nr=self.gui.avgs_nr,
+                                time_period=self.gui.time_period, date_ranges=self.date_ranges)],
                 [gen_footer_table(width=width, height=height_list[2])]
             ],
                 colWidths=width,

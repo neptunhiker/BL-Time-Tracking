@@ -6,7 +6,7 @@ from reportlab.lib import colors
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 
-def gen_body_table(width, height, data, training_name, training_nr, participant_name, date_ranges):
+def gen_body_table(width, height, data, training_name, training_nr, participant_name, avgs_nr, time_period, date_ranges):
 
     participant_name = participant_name
     width_list = [
@@ -17,13 +17,14 @@ def gen_body_table(width, height, data, training_name, training_nr, participant_
 
     height_list = [
         0.15 * height,
-        0.6 * height,
-        0.15 * height,
+        0.67 * height,
+        0.08 * height,
         0.10 * height,
         ]
     res = Table([
-        ["", _gen_meta_data(participant_name=participant_name, training_name=training_name, training_nr=training_nr,
-                            data=data, date_ranges=date_ranges), ""],
+        ["", _gen_meta_data(width=width_list[1], height=height_list[3],
+                            participant_name=participant_name, training_name=training_name, training_nr=training_nr,
+                            avgs_nr=avgs_nr, time_period=time_period, date_ranges=date_ranges), ""],
         ["", _gen_times_table(width=width_list[1], height=height_list[1], data=data), ""],
         ["", _gen_confirmation_text(training_name=training_name, participant_name=participant_name,
                                     date_ranges=date_ranges), ""],
@@ -55,41 +56,57 @@ def gen_body_table(width, height, data, training_name, training_nr, participant_
     return res
 
 
-def _gen_meta_data(participant_name, training_name, training_nr, data, date_ranges):
+def _gen_meta_data(width, height, participant_name, training_name, training_nr, avgs_nr, time_period, date_ranges):
 
-    month_names = {}
-    month_names[1] = "Januar"
-    month_names[2] = "Februar"
-    month_names[3] = "März"
-    month_names[4] = "April"
-    month_names[5] = "Mai"
-    month_names[6] = "Juni"
-    month_names[7] = "Juli"
-    month_names[8] = "August"
-    month_names[9] = "September"
-    month_names[10] = "Oktober"
-    month_names[11] = "November"
-    month_names[12] = "Dezember"
+    # month_names = {}
+    # month_names[1] = "Januar"
+    # month_names[2] = "Februar"
+    # month_names[3] = "März"
+    # month_names[4] = "April"
+    # month_names[5] = "Mai"
+    # month_names[6] = "Juni"
+    # month_names[7] = "Juli"
+    # month_names[8] = "August"
+    # month_names[9] = "September"
+    # month_names[10] = "Oktober"
+    # month_names[11] = "November"
+    # month_names[12] = "Dezember"
 
-    header = "Anwesenheitsliste:"
-    min_month = date_ranges[0][0:2]
-    min_year = date_ranges[0][-4:]
-    max_month = date_ranges[1][0:2]
-    max_year = date_ranges[1][-4:]
-    min_month_german = month_names[int(min_month)][0:3]
-    max_month_german = month_names[int(max_month)][0:3]
+    header = "Anwesenheitsliste"
+    # min_month = date_ranges[0][0:2]
+    # min_year = date_ranges[0][-4:]
+    # max_month = date_ranges[1][0:2]
+    # max_year = date_ranges[1][-4:]
+    # min_month_german = month_names[int(min_month)][0:3]
+    # max_month_german = month_names[int(max_month)][0:3]
+    #
+    # if min_year == max_year:
+    #     header = f"{header} {min_month_german} bis {max_month_german} {max_year}"
+    # else:
+    #     header = f"{header} {min_month_german} {min_year} bis {max_month_german} {max_year}"
 
-    if min_year == max_year:
-        header = f"{header} {min_month_german} bis {max_month_german} {max_year}"
-    else:
-        header = f"{header} {min_month_german} {min_year} bis {max_month_german} {max_year}"
+    # res = Table([
+    #     [header],
+    #     [f"Maßnahme: {training_name}"],
+    #     [f"Maßnahmennummer: {training_nr}"],
+    #     [f"Teilnehmer:in {participant_name}"]
+    # ])
+
+    width_list = [
+        0.5 * width,
+        0.4 * width,
+        0.1 * width
+        ]
 
     res = Table([
-        [header],
-        [f"Maßnahme: {training_name}"],
-        [f"Maßnahmennummer: {training_nr}"],
-        [f"Teilnehmer:in {participant_name}"]
-    ])
+        [header, ""],
+        [f"Teilnehmer:in {participant_name}", f"Maßnahme: {training_name}", ""],
+        [f"AVGS-Gutscheinnummer: {avgs_nr}", f"Maßnahmennummer: {training_nr}", ""],
+        [f"Bewilligungszeitraum: {time_period}", "", ""]
+    ],
+        rowHeights=height / 3,
+        colWidths=width_list
+    )
 
     res.setStyle([
         # ("GRID", (0, 0), (-1, -1), 1, "red"),
@@ -153,7 +170,7 @@ def _gen_confirmation_text(training_name, participant_name, date_ranges):
     para02 = Paragraph(f"""
     <i>
     Hiermit bestätige ich, {participant_name}, dass ich im Rahmen der Maßnahme '{training_name}' 
-    der <b>BeginnerLuft gGmbH</b> an den oben genannten Terminen im Zeitraum {time_period} teilgenommen habe.
+    der <b>BeginnerLuft gGmbH</b> an den oben genannten Terminen teilgenommen habe.
     </i>
     """, para02_style)
 
@@ -168,7 +185,7 @@ def _gen_signature_table(width, height, participant_name):
     width_list = [
         0.4 * width,
         0.2 * width,
-        0.40 * width
+        0.4 * width
     ]
 
     # img_path = "resources/Vanguard.png"
