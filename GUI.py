@@ -271,7 +271,7 @@ class BeginnerLuftGUI(tk.Tk):
         self.active_frame.grid(row=1, column=0, sticky="nsew")
         self.active_frame.grid_columnconfigure(0, weight=1)
         self.active_frame.grid_columnconfigure(1, weight=1)
-        for i in range(10):
+        for i in range(9):
             self.active_frame.grid_rowconfigure(i, weight=1)
 
         lbl_overview = ttk.Label(self.active_frame, text="Datenübersicht", style="OverviewHeader.TLabel")
