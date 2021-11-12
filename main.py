@@ -38,7 +38,7 @@ class TimeReport():
         # get times of coachings conducted by BeginnerLuft
         try:
             if platform.system() == "Darwin":  # MAC
-                self.df_coach = pd.read_excel(self.gui.file_ze_coach, sheetname="Zeiterfassung")
+                self.df_coach = pd.read_excel(self.gui.file_ze_coach, sheet_name="Zeiterfassung")
             else:
                 if int(pd.__version__[2:4]) < 21:
                     self.df_coach = pd.read_excel(self.gui.file_ze_coach, sheetname="Zeiterfassung")
@@ -55,7 +55,7 @@ class TimeReport():
 
         try:
             if platform.system() == "Darwin":  # MAC
-                self.df_coach = pd.read_excel(self.gui.file_ze_coach, sheetname="Zeiterfassung")
+                self.df_coach = pd.read_excel(self.gui.file_ze_coach, sheet_name="Zeiterfassung")
             else:
                 if int(pd.__version__[2:4]) < 21:
                     self.df_beginnerluft = pd.read_excel(self.gui.file_ze_beginnerluft, sheetname="Zeiterfassung")
