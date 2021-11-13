@@ -306,7 +306,6 @@ class BeginnerLuftGUI(tk.Tk):
         for i, label in enumerate(right_hand_labels):
             label.grid(row=i + 1, column=1, sticky="nw", padx=(10, 0))
 
-
         self.create_button_back(row=8, collection_function=self.collection_placeholder,
                                 nav_function=self.create_menu_ze_beginnerluft)
         self.create_button_forward(row=8, column=1, collection_function=self.collection_placeholder,
